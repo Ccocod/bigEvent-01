@@ -89,13 +89,14 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        <input type="text" class="id" name="id" style="display: none">
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
-                            <input type="text" class="form-control" id="recipient-name">
+                            <input type="text" class="form-control name" name="name" id="recipient-name">
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="control-label">分类别名:</label>
-                            <input type="text" class="form-control" id="recipient-slug">
+                            <input type="text" class="form-control slug" name="slug" id="recipient-slug">
                         </div>
                     </form>
                 </div>
@@ -113,15 +114,14 @@
                 <td>{{v.name}}</td>
                 <td>{{v.slug}}</td>
                 <td class="text-center">
-                    <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});"
-                        class="btn btn-info btn-xs">编辑</a>
+                    <a href="#" data-id="{{v.id}}" class="btn btn-info btn-xs btn-edit">编辑</a>
                     <a href="#" data-id="{{v.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
                 </td>
             </tr>
             {{/each}}
     </script>
     <script id="tpl2" type="text/html">
-    
+
         <tr>
                 <td>{{name}}</td>
                 <td>{{slug}}</td>
@@ -147,49 +147,93 @@
                 }
             })
 
-            $('#model_add').on('click',function(){
-                var name=$('#recipient-name').val();
-                var slug=$('#recipient-name').val();
-                $.post({
-                    url:"http://localhost:8000/admin/category_add",
-                    data:{'name':name,'slug':slug},
-                    success:function(res){
-                        console.log(res);
-                        if(res.code==200){
-                            // location.reload();
-                            var obj={
-                                name:name,
-                                slug:slug,
-                                
+            $('#model_add').on('click', function () {
+                if ($(this).hasClass('btn-success')) {
+                    // var id = $('.modal-body .id').val()
+                    // var name = $('.modal-body .name').val()
+                    // var slug = $('.modal-body .slug').val()
+                    var data= $('.modal-body form').serialize()
+                    $.post({
+                        url: "http://localhost:8000/admin/category_edit",
+                        data:data,
+                        success: function (res) {
+                            console.log(res);
+                            if (res.code == 200) {
+                                location.reload()
+                                alert('修改成功')
                             }
-                            var str=template('tpl2',obj)
-                            location.reload();
+
                         }
-                       
-                    }
-                })
+                    })
+
+                } else {
+                    var name = $('#recipient-name').val();
+                    var slug = $('#recipient-slug').val();
+                    $('#model_add').text('新增').remove('btn-success');
+                    $('#addModal .modal-title').html('新增分类名称');
+
+                    $.post({
+                        url: "http://localhost:8000/admin/category_add",
+                        data: { 'name': name, 'slug': slug },
+                        success: function (res) {
+                            console.log(res);
+                            if (res.code == 200) {
+                                // location.reload();
+                                var obj = {
+                                    name: name,
+                                    slug: slug,
+
+                                }
+                                var str = template('tpl2', obj)
+                                alert('增加成功')
+                                location.reload();
+                            }
+
+                        }
+                    })
+                }
+
             })
 
-            $('tbody').on('click','.btn-delete',function(e){
+            $('tbody').on('click', '.btn-delete', function (e) {
                 e.preventDefault();
-                if(confirm('你确定要删除吗?')){
+                if (confirm('你确定要删除吗?')) {
                     var that = $(this)
-                    var cate= $(this).attr('data-id')
+                    var cate = $(this).attr('data-id')
                     console.log(cate);
-                    
+
                     $.post({
-                        url:'http://localhost:8000/admin/category_delete',
-                        data:{'id':cate},
-                        success:function(res){
+                        url: 'http://localhost:8000/admin/category_delete',
+                        data: { 'id': cate },
+                        success: function (res) {
                             console.log(res);
-                            if(res.code==200){
+                            if (res.code == 200) {
                                 that.parents('tr').remove();
                             }
                         }
                     })
-                   
+
                 }
             })
+
+            //    需求:编辑
+            $('tbody').on('click', '.btn-edit', function () {
+                $('#addModal .modal-title').html('修改分类名称');
+                $('#addModal').modal('show');
+                $('#model_add').text('修改').addClass('btn-success')
+                var name = $(this).parent().prev().prev().text()
+                var slug = $(this).parent().prev().text()
+                var id = $(this).attr('data-id')
+                $('.modal-body .id').val(id)
+                $('.modal-body .name').val(name)
+                $('.modal-body .slug').val(slug)
+                console.log(name);
+
+
+
+            })
+
+
         })
 
         $('#addModal').modal({
@@ -207,12 +251,12 @@
             $('#addModal').modal('hide');
         });
 
-        $('.category_table').delegate('a', 'click', function () {
-            if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
-            }
-        })
+        // $('.category_table').delegate('a', 'click', function () {
+        //     if ($(this).hasClass('btn-info')) {
+        //         $('#addModal .modal-title').html('新增分类名称');
+        //         $('#addModal').modal('show');
+        //     }
+        // })
 
 
 
