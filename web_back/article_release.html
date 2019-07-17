@@ -16,7 +16,7 @@
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
     <script src="./js/template-web.js"> </script>
-    
+    <script src="js/moment.js"></script>
 </head>
 
 <body>
@@ -110,7 +110,8 @@
         }
     })
 
-    
+    var str= moment().format('MMMM Do YYYY, h:mm:ss a');
+    $('#dateinput').val(str)
 })
   
 </script>
