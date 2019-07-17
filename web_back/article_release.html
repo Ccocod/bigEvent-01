@@ -15,6 +15,8 @@
     <script src="js/jedate/js/jedate.js"></script>
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
+    <script src="./js/template-web.js"> </script>
+    
 </head>
 
 <body>
@@ -40,7 +42,7 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select class="form-controlv article_cate">
                             <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -80,12 +82,37 @@
             </form>
         </div>
     </div>
+  
+    <script type="text/html" id="tpl">
+        <option value=''>所有分类</option>
+        {{each data v}}
+        <option value='{{v.id}}'>{{v.name}}</option>
+        {{/each}}
+    
+   
+    </script>
 <script>
-    $("#exampleInputFile").on('change',function(){
+    $(function(){
+        $("#exampleInputFile").on('change',function(){
         var iconFile= this.files[0]
         var url= URL.createObjectURL(iconFile)
         $(this).prev().prev().attr('src',url)
     })
+    $.get({
+        url:'http://localhost:8000/admin/category_search',
+        success:function(res){
+            console.log(res);
+            if(res.code==200){
+                var html= template('tpl',res)
+                $('.article_cate').html(html)
+            }
+            
+        }
+    })
+
+    
+})
+  
 </script>
 </body>
 
